@@ -25,6 +25,19 @@ const run = async () => {
 
         const db = client.db("AccrossTheGlobeTask");
         const articleCollection = db.collection("article");
+
+        // API to Run Server
+        app.get("/", async (req, res) => {
+            res.send("Server is Running");
+        }
+        );
+
+        // API to get all articles
+        app.get("/articles", async (req, res) => {
+            const articles = await articleCollection.find({}).toArray();
+            res.send(articles)
+        }
+        );
     }
     finally {
         // await client.close();
