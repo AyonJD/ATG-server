@@ -25,6 +25,7 @@ const run = async () => {
 
         const db = client.db("AccrossTheGlobeTask");
         const articleCollection = db.collection("article");
+        const groupCollection = db.collection("group");
 
         // API to Run Server
         app.get("/", async (req, res) => {
@@ -36,6 +37,13 @@ const run = async () => {
         app.get("/articles", async (req, res) => {
             const articles = await articleCollection.find({}).toArray();
             res.send(articles)
+        }
+        );
+
+        //API to get all groups
+        app.get("/groups", async (req, res) => {
+            const groups = await groupCollection.find({}).toArray();
+            res.send(groups)
         }
         );
     }
