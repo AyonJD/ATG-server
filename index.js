@@ -26,6 +26,7 @@ const run = async () => {
         const db = client.db("AccrossTheGlobeTask");
         const articleCollection = db.collection("article");
         const groupCollection = db.collection("group");
+        const usersCollection = db.collection("users");
 
         // API to Run Server
         app.get("/", async (req, res) => {
@@ -46,6 +47,47 @@ const run = async () => {
             res.send(groups)
         }
         );
+
+
+        //API to post a unique user
+        app.post("/users/:email", async (req, res) => {
+            const { email } = req.params;
+            const incomingUser = req.body;
+            const user = await usersCollection.findOne({ email });
+            if (user) {
+                res.send("User already exists");
+            } else {
+                await usersCollection.insertOne(incomingUser);
+                res.send("User created");
+            }
+        }
+        );
+
+        //API for user login
+        app.get("/users/:email", async (req, res) => {
+            const { email } = req.params;
+            const loginRequest = req.body;
+            const user = await usersCollection.findOne({ email });
+            if (user) {
+                if (user.password === loginRequest.password) {
+                    res.send("Login Successful");
+                } else {
+                    res.send("Login Failed");
+                }
+            } else {
+                res.send("User does not exist");
+            }
+        });
+
+
+        // API to get all users
+        app.get("/users", async (req, res) => {
+            const users = await usersCollection.find({}).toArray();
+            res.send(users)
+        }
+        );
+
+
     }
     finally {
         // await client.close();
