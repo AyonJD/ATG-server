@@ -93,6 +93,32 @@ const run = async () => {
         }
         );
 
+        //API to post a new article
+        app.post("/articles", async (req, res) => {
+            const article = req.body;
+            await articleCollection.insertOne(article);
+            res.send("Article created");
+        }
+        );
+
+        //API to update an article
+        app.put("/articles/:id", async (req, res) => {
+            const id = req.params.id;
+            const article = req.body;
+            await articleCollection.updateOne({ _id: ObjectId(id) }, { $set: article });
+            res.send("Article updated");
+        }
+        );
+
+        //API to delete an article
+        app.delete("/articles/:id", async (req, res) => {
+            const id = req.params.id;
+            await articleCollection.deleteOne({ _id: ObjectId(id) });
+            res.send("Article deleted");
+        }
+        );
+
+
 
         // API to get all users
         app.get("/users", async (req, res) => {
