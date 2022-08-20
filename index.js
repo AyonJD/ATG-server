@@ -79,6 +79,20 @@ const run = async () => {
             }
         });
 
+        //API to update user.password
+        app.put("/users/:email", async (req, res) => {
+            const { email } = req.params;
+            const { password } = req.body;
+            const user = await usersCollection.findOne({ email });
+            if (user) {
+                await usersCollection.updateOne({ email }, { $set: { password } });
+                res.send("Password updated");
+            } else {
+                res.send("User does not exist");
+            }
+        }
+        );
+
 
         // API to get all users
         app.get("/users", async (req, res) => {
