@@ -55,10 +55,10 @@ const run = async () => {
             const incomingUser = req.body;
             const user = await usersCollection.findOne({ email });
             if (user) {
-                res.send("User already exists");
+                res.send({ message: "User already exists" });
             } else {
                 await usersCollection.insertOne(incomingUser);
-                res.send("User created");
+                res.send({ user: incomingUser, message: "User created" });
             }
         }
         );
@@ -66,16 +66,11 @@ const run = async () => {
         //API for user login
         app.get("/users/:email", async (req, res) => {
             const { email } = req.params;
-            const loginRequest = req.body;
             const user = await usersCollection.findOne({ email });
             if (user) {
-                if (user.password === loginRequest.password) {
-                    res.send("Login Successful");
-                } else {
-                    res.send("Login Failed");
-                }
+                res.send(user);
             } else {
-                res.send("User does not exist");
+                res.send({ message: "User not found" });
             }
         });
 
@@ -83,12 +78,13 @@ const run = async () => {
         app.put("/users/:email", async (req, res) => {
             const { email } = req.params;
             const { password } = req.body;
+            console.log(email, password);
             const user = await usersCollection.findOne({ email });
             if (user) {
                 await usersCollection.updateOne({ email }, { $set: { password } });
-                res.send("Password updated");
+                res.send({ message: "Password updated" });
             } else {
-                res.send("User does not exist");
+                res.send({ message: "User does not exist" });
             }
         }
         );
@@ -97,16 +93,23 @@ const run = async () => {
         app.post("/articles", async (req, res) => {
             const article = req.body;
             await articleCollection.insertOne(article);
-            res.send("Article created");
+            res.send({ message: "Article created" });
         }
         );
+
+        //Get signle article by id
+        app.get("/articles/:id", async (req, res) => {
+            const { id } = req.params;
+            const article = await articleCollection.findOne({ _id: ObjectId(id) });
+            res.send(article);
+        })
 
         //API to update an article
         app.put("/articles/:id", async (req, res) => {
             const id = req.params.id;
             const article = req.body;
-            await articleCollection.updateOne({ _id: ObjectId(id) }, { $set: article });
-            res.send("Article updated");
+            const result = await articleCollection.updateOne({ _id: ObjectId(id) }, { $set: article });
+            res.send(result);
         }
         );
 
@@ -114,7 +117,7 @@ const run = async () => {
         app.delete("/articles/:id", async (req, res) => {
             const id = req.params.id;
             await articleCollection.deleteOne({ _id: ObjectId(id) });
-            res.send("Article deleted");
+            res.send({ message: "Article deleted" });
         }
         );
 
